@@ -1,0 +1,2 @@
+MEASURE 'Measures'[Total At Bats] = 
+SUM(boxscore[at_bats])

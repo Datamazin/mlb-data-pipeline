@@ -1,0 +1,228 @@
+// =====================================================
+// Enhanced Power BI DAX Measures for MLB Boxscore Analytics
+// Copy these measures into the DAX Query View in Power BI
+// Updated to include Doubles, Triples, and Home Runs
+// =====================================================
+
+// =====================
+// BASIC BATTING STATISTICS
+// =====================
+
+Total Games = 
+MEASURE boxscore[Total Games] = DISTINCTCOUNT(boxscore[game_id])
+
+Total Players = 
+MEASURE boxscore[Total Players] = DISTINCTCOUNT(boxscore[player_id])
+
+Total At Bats = 
+MEASURE boxscore[Total At Bats] = SUM(boxscore[at_bats])
+
+Total Runs = 
+MEASURE boxscore[Total Runs] = SUM(boxscore[runs])
+
+Total Hits = 
+MEASURE boxscore[Total Hits] = SUM(boxscore[hits])
+
+Total Doubles = 
+MEASURE boxscore[Total Doubles] = SUM(boxscore[doubles])
+
+Total Triples = 
+MEASURE boxscore[Total Triples] = SUM(boxscore[triples])
+
+Total Home Runs = 
+MEASURE boxscore[Total Home Runs] = SUM(boxscore[home_runs])
+
+Total RBI = 
+MEASURE boxscore[Total RBI] = SUM(boxscore[rbi])
+
+Total Walks = 
+MEASURE boxscore[Total Walks] = SUM(boxscore[walks])
+
+Total Strikeouts = 
+MEASURE boxscore[Total Strikeouts] = SUM(boxscore[strikeouts])
+
+// =====================
+// CALCULATED METRICS
+// =====================
+
+Batting Average = 
+MEASURE boxscore[Batting Average] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+IF(TotalAtBats > 0, DIVIDE(TotalHits, TotalAtBats, 0), 0)
+
+On Base Percentage = 
+MEASURE boxscore[On Base Percentage] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+IF(PlateAppearances > 0, DIVIDE(TotalHits + TotalWalks, PlateAppearances, 0), 0)
+
+Slugging Percentage = 
+MEASURE boxscore[Slugging Percentage] = 
+VAR Singles = SUM(boxscore[hits]) - SUM(boxscore[doubles]) - SUM(boxscore[triples]) - SUM(boxscore[home_runs])
+VAR Doubles = SUM(boxscore[doubles])
+VAR Triples = SUM(boxscore[triples])
+VAR HomeRuns = SUM(boxscore[home_runs])
+VAR TotalBases = Singles + (2 * Doubles) + (3 * Triples) + (4 * HomeRuns)
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+IF(TotalAtBats > 0, DIVIDE(TotalBases, TotalAtBats, 0), 0)
+
+OPS = 
+MEASURE boxscore[OPS] = [On Base Percentage] + [Slugging Percentage]
+
+Singles = 
+MEASURE boxscore[Singles] = 
+SUM(boxscore[hits]) - SUM(boxscore[doubles]) - SUM(boxscore[triples]) - SUM(boxscore[home_runs])
+
+Total Bases = 
+MEASURE boxscore[Total Bases] = 
+VAR Singles = [Singles]
+VAR Doubles = SUM(boxscore[doubles])
+VAR Triples = SUM(boxscore[triples])
+VAR HomeRuns = SUM(boxscore[home_runs])
+RETURN Singles + (2 * Doubles) + (3 * Triples) + (4 * HomeRuns)
+
+Extra Base Hits = 
+MEASURE boxscore[Extra Base Hits] = 
+SUM(boxscore[doubles]) + SUM(boxscore[triples]) + SUM(boxscore[home_runs])
+
+Contact Rate = 
+MEASURE boxscore[Contact Rate] = 
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR TotalStrikeouts = SUM(boxscore[strikeouts])
+VAR ContactAtBats = TotalAtBats - TotalStrikeouts
+RETURN 
+IF(TotalAtBats > 0, DIVIDE(ContactAtBats, TotalAtBats, 0), 0)
+
+Walk Rate = 
+MEASURE boxscore[Walk Rate] = 
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+IF(PlateAppearances > 0, DIVIDE(TotalWalks, PlateAppearances, 0), 0)
+
+Strikeout Rate = 
+MEASURE boxscore[Strikeout Rate] = 
+VAR TotalStrikeouts = SUM(boxscore[strikeouts])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR TotalWalks = SUM(boxscore[walks])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+IF(PlateAppearances > 0, DIVIDE(TotalStrikeouts, PlateAppearances, 0), 0)
+
+// =====================
+// TEAM ANALYSIS
+// =====================
+
+Avg Runs Per Game = 
+MEASURE boxscore[Avg Runs Per Game] = 
+VAR TotalRuns = SUM(boxscore[runs])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+IF(TotalGames > 0, DIVIDE(TotalRuns, TotalGames, 0), 0)
+
+Avg Hits Per Game = 
+MEASURE boxscore[Avg Hits Per Game] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+IF(TotalGames > 0, DIVIDE(TotalHits, TotalGames, 0), 0)
+
+Avg Home Runs Per Game = 
+MEASURE boxscore[Avg Home Runs Per Game] = 
+VAR TotalHomeRuns = SUM(boxscore[home_runs])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+IF(TotalGames > 0, DIVIDE(TotalHomeRuns, TotalGames, 0), 0)
+
+Team Power Factor = 
+MEASURE boxscore[Team Power Factor] = 
+VAR ExtraBaseHits = [Extra Base Hits]
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(ExtraBaseHits, TotalHits, 0), 0)
+
+// =====================
+// ADVANCED ANALYTICS
+// =====================
+
+Runs Per Hit = 
+MEASURE boxscore[Runs Per Hit] = 
+VAR TotalRuns = SUM(boxscore[runs])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(TotalRuns, TotalHits, 0), 0)
+
+RBI Efficiency = 
+MEASURE boxscore[RBI Efficiency] = 
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(TotalRBI, TotalHits, 0), 0)
+
+Plate Discipline = 
+MEASURE boxscore[Plate Discipline] = 
+VAR WalkRate = [Walk Rate]
+VAR StrikeoutRate = [Strikeout Rate]
+RETURN WalkRate - StrikeoutRate
+
+Hit Distribution Singles % = 
+MEASURE boxscore[Hit Distribution Singles %] = 
+VAR Singles = [Singles]
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(Singles, TotalHits, 0), 0)
+
+Hit Distribution Doubles % = 
+MEASURE boxscore[Hit Distribution Doubles %] = 
+VAR Doubles = SUM(boxscore[doubles])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(Doubles, TotalHits, 0), 0)
+
+Hit Distribution Triples % = 
+MEASURE boxscore[Hit Distribution Triples %] = 
+VAR Triples = SUM(boxscore[triples])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(Triples, TotalHits, 0), 0)
+
+Hit Distribution Home Runs % = 
+MEASURE boxscore[Hit Distribution Home Runs %] = 
+VAR HomeRuns = SUM(boxscore[home_runs])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+IF(TotalHits > 0, DIVIDE(HomeRuns, TotalHits, 0), 0)
+
+// =====================
+// SUMMARY MEASURES
+// =====================
+
+Performance Summary = 
+MEASURE boxscore[Performance Summary] = 
+"AVG: " & FORMAT([Batting Average], "0.000") & 
+" | OBP: " & FORMAT([On Base Percentage], "0.000") & 
+" | SLG: " & FORMAT([Slugging Percentage], "0.000") & 
+" | OPS: " & FORMAT([OPS], "0.000")
+
+Hit Type Summary = 
+MEASURE boxscore[Hit Type Summary] = 
+"1B: " & FORMAT([Singles], "#,0") & 
+" | 2B: " & FORMAT(SUM(boxscore[doubles]), "#,0") & 
+" | 3B: " & FORMAT(SUM(boxscore[triples]), "#,0") & 
+" | HR: " & FORMAT(SUM(boxscore[home_runs]), "#,0")
+
+Complete Offensive Summary = 
+MEASURE boxscore[Complete Offensive Summary] = 
+"G: " & FORMAT(DISTINCTCOUNT(boxscore[game_id]), "#,0") & 
+" | AB: " & FORMAT(SUM(boxscore[at_bats]), "#,0") & 
+" | H: " & FORMAT(SUM(boxscore[hits]), "#,0") & 
+" | HR: " & FORMAT(SUM(boxscore[home_runs]), "#,0") & 
+" | RBI: " & FORMAT(SUM(boxscore[rbi]), "#,0") & 
+" | AVG: " & FORMAT([Batting Average], "0.000")

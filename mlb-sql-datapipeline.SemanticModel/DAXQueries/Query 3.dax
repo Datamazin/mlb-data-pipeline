@@ -1,0 +1,15 @@
+EVALUATE
+	SELECTCOLUMNS(
+		TOPN(
+			100,
+			'players',
+			'players'[player_id],
+			ASC
+		),
+		'players'[player_id],
+		'players'[player_name],
+		'players'[team_id],
+		'players'[position],
+		'players'[created_at]
+	)
+	ORDER BY 'players'[player_id] ASC

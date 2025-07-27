@@ -1,0 +1,59 @@
+table players
+	lineageTag: 337eaf00-70fc-4739-8719-dc11d8af55da
+
+	column player_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 2455ef48-d83d-47e8-8c0d-0b9f26f2cb14
+		summarizeBy: none
+		sourceColumn: player_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column player_name
+		dataType: string
+		lineageTag: 09042713-bdf9-415e-b5f5-6bce8761ec80
+		summarizeBy: none
+		sourceColumn: player_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column team_id
+		dataType: int64
+		formatString: 0
+		lineageTag: ef648d9d-65ee-486d-94a7-b5253cc65f20
+		summarizeBy: none
+		sourceColumn: team_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column position
+		dataType: string
+		lineageTag: 8d7d09ea-90b2-47b5-bf0e-6b594c748bf4
+		summarizeBy: none
+		sourceColumn: position
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e94c62fe-5f86-449b-94dd-3e2da60e34ca
+		summarizeBy: none
+		sourceColumn: created_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition players = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "mlb_data"),
+				    dbo_players = Source{[Schema="dbo",Item="players"]}[Data]
+				in
+				    dbo_players
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

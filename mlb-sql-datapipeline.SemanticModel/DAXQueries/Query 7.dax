@@ -1,0 +1,3 @@
+Total At Bats = SUM(FACT_BOXSCORE[at_bats])
+Total Hits = SUM(FACT_BOXSCORE[hits])
+Batting Average = DIVIDE(SUM(FACT_BOXSCORE[hits]), SUM(FACT_BOXSCORE[at_bats]), 0)

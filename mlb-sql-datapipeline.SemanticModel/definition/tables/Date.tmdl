@@ -1,0 +1,334 @@
+table Date
+	lineageTag: b62dcaa3-2141-458e-9725-0a81090d6698
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 2aeec4a9-7baf-477d-ba51-f3931d60691c
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 56f96e4a-10f2-4ad8-b3f6-bf7a71a2d186
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e3c0c1f-5908-4567-b31c-ab7a4417ada4
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 335aa107-f483-481f-a5ae-51385a837c7a
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d99b93e-e277-41fc-a752-bab7f4d2def3
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_of_year
+		dataType: int64
+		formatString: 0
+		lineageTag: cd48e122-309d-4f3c-a1db-d7ce804bed8e
+		summarizeBy: none
+		sourceColumn: week_of_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 8f52faa3-526e-4a49-9416-6fa70d2ec900
+		summarizeBy: none
+		sourceColumn: day_of_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_month
+		dataType: int64
+		formatString: 0
+		lineageTag: bf042f73-45c5-4c8c-a81e-e23d0f81435c
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		dataType: int64
+		formatString: 0
+		lineageTag: 514f8f6e-642d-4b50-995b-8c421d14f7bd
+		summarizeBy: none
+		sourceColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_text
+		dataType: string
+		lineageTag: 6959b507-324b-423f-bec6-c10f613c0d13
+		summarizeBy: none
+		sourceColumn: year_text
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter_text
+		dataType: string
+		lineageTag: d476f526-fc3e-4aaf-94d0-562c23931e53
+		summarizeBy: none
+		sourceColumn: quarter_text
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: 886da1cb-fc40-44d2-adfd-2254b052198f
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name_short
+		dataType: string
+		lineageTag: 0ffd3927-7c84-48c5-b0bc-4ce04797a9ad
+		summarizeBy: none
+		sourceColumn: month_name_short
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_year
+		dataType: string
+		lineageTag: 65205fbf-078b-49bd-ba6e-57096396f647
+		summarizeBy: none
+		sourceColumn: month_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: dca66542-6bd4-46a1-a0bd-e4879bf46c70
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name_short
+		dataType: string
+		lineageTag: 836e8045-674a-4054-b118-f6ab345265aa
+		summarizeBy: none
+		sourceColumn: day_name_short
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9cb80a05-e168-4ed5-b32a-1c3e61533954
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekday
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 29255a25-45b2-4d44-a6f4-9b29f8c770bd
+		summarizeBy: none
+		sourceColumn: is_weekday
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_month_start
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f8bd111e-8bda-491f-b39d-462461626382
+		summarizeBy: none
+		sourceColumn: is_month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_month_end
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 732712dc-628c-490c-9c04-4457c1c8458d
+		summarizeBy: none
+		sourceColumn: is_month_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_quarter_start
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: da62376c-a168-43bf-b75d-e6282113d419
+		summarizeBy: none
+		sourceColumn: is_quarter_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_quarter_end
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8b519f0d-24f9-42f9-bca5-fb55c565067b
+		summarizeBy: none
+		sourceColumn: is_quarter_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_year_start
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5056eebb-a1a6-436b-be3f-4b022e67713b
+		summarizeBy: none
+		sourceColumn: is_year_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_year_end
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6099f196-f116-4b8f-a0b1-d544e428ccab
+		summarizeBy: none
+		sourceColumn: is_year_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column mlb_season_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a9def0b6-782f-4506-a673-1202a9057104
+		summarizeBy: none
+		sourceColumn: mlb_season_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_mlb_regular_season
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: aeccb7ba-85e8-46c8-acc4-cf60fbcee043
+		summarizeBy: none
+		sourceColumn: is_mlb_regular_season
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_mlb_spring_training
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5e14ba8e-68a7-4933-b61b-5df1c0887e60
+		summarizeBy: none
+		sourceColumn: is_mlb_spring_training
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_mlb_playoffs
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 88e81a40-6093-4b6b-92d2-2e27767e1a63
+		summarizeBy: none
+		sourceColumn: is_mlb_playoffs
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_mlb_offseason
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b145ce1e-a505-4197-b55a-cc6834d54050
+		summarizeBy: none
+		sourceColumn: is_mlb_offseason
+
+		annotation SummarizationSetBy = Automatic
+
+	column mlb_season_phase
+		dataType: string
+		lineageTag: 87a1dec3-b6ce-4c54-8511-79d5765dfe70
+		summarizeBy: none
+		sourceColumn: mlb_season_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column days_from_today
+		dataType: int64
+		formatString: 0
+		lineageTag: fa5f53f6-f835-47f9-a928-1c1ce9f1cc2b
+		summarizeBy: none
+		sourceColumn: days_from_today
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_past
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: bd399d3a-b795-4cdb-8945-1c32f15e14cb
+		summarizeBy: none
+		sourceColumn: is_past
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_future
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2f60169e-b056-47ca-a7f8-1fc2c4de119f
+		summarizeBy: none
+		sourceColumn: is_future
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_today
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3ba053fc-2b4c-4c05-b88e-7d22beff5dc9
+		summarizeBy: none
+		sourceColumn: is_today
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e686aaf3-588c-46fe-b7b5-0b6b614ac8a2
+		summarizeBy: none
+		sourceColumn: created_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "mlb_data"),
+				    dbo_dim_date = Source{[Schema="dbo",Item="dim_date"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dbo_dim_date,{{"full_date", "Date"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

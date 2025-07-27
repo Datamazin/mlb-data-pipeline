@@ -1,0 +1,7 @@
+DEFINE
+    MEASURE 'boxscore'[At Bats] = Sum(boxscore[at_bats])
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "At Bats", [At Bats]
+    )

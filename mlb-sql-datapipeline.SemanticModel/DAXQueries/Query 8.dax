@@ -1,0 +1,7 @@
+DEFINE
+    MEASURE 'boxscore'[Total Runs] = SUM(boxscore[runs])
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "Total Runs", [Total Runs]
+    )

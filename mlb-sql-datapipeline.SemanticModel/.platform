@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "mlb-sql-datapipeline"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b03c070f-d4b9-49f4-b7c8-25aac15cd03f"
+  }
+}

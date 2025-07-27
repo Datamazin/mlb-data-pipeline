@@ -1,0 +1,41 @@
+DEFINE
+
+MEASURE 'boxscore'[Total HR] = 
+SUM(boxscore[home_runs])
+
+MEASURE 'boxscore'[Total Doubles] = 
+SUM(boxscore[doubles])
+
+MEASURE 'boxscore'[Total Triples] = 
+SUM(boxscore[triples])
+
+MEASURE 'boxscore'[Total Hits] = 
+SUM(boxscore[hits])
+
+MEASURE 'boxscore'[Total RBI] = 
+SUM(boxscore[rbi])
+
+MEASURE 'boxscore'[Total Walks] = 
+SUM(boxscore[walks])
+
+MEASURE 'boxscore'[Total Strikeouts] = 
+SUM(boxscore[strikeouts])
+
+MEASURE 'boxscore'[On Base Percentage] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+    IF(PlateAppearances > 0,
+       DIVIDE(TotalHits + TotalWalks, PlateAppearances, 0),
+       BLANK())
+	   
+	   
+MEASURE 'boxscore'[Batting Average] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+    IF(TotalAtBats > 0, 
+       DIVIDE(TotalHits, TotalAtBats, 0), 
+       BLANK())

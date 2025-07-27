@@ -1,0 +1,293 @@
+// =====================================================
+// MLB Boxscore DAX boxscore for Power BI
+// =====================================================
+// Copy each MEASURE statement individually into Power BI
+// Adjust table names to match your model (currently using: boxscore, teams, players)
+
+// =====================================================
+// BASIC BATTING STATISTICS
+// =====================================================
+
+MEASURE 'boxscore'[Total At Bats] = 
+SUM(boxscore[at_bats])
+
+MEASURE 'boxscore'[Total Runs] = 
+SUM(boxscore[runs])
+
+MEASURE 'boxscore'[Total Hits] = 
+SUM(boxscore[hits])
+
+MEASURE 'boxscore'[Total RBI] = 
+SUM(boxscore[rbi])
+
+MEASURE 'boxscore'[Total Walks] = 
+SUM(boxscore[walks])
+
+MEASURE 'boxscore'[Total Strikeouts] = 
+SUM(boxscore[strikeouts])
+
+// =====================================================
+// CALCULATED BATTING STATISTICS
+// =====================================================
+
+MEASURE 'boxscore'[Batting Average] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+    IF(TotalAtBats > 0, 
+       DIVIDE(TotalHits, TotalAtBats, 0), 
+       BLANK())
+
+MEASURE 'boxscore'[On Base Percentage] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+    IF(PlateAppearances > 0,
+       DIVIDE(TotalHits + TotalWalks, PlateAppearances, 0),
+       BLANK())
+
+MEASURE 'boxscore'[Runs Per Game] = 
+VAR TotalRuns = SUM(boxscore[runs])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+    IF(TotalGames > 0,
+       DIVIDE(TotalRuns, TotalGames, 0),
+       BLANK())
+
+MEASURE 'boxscore'[RBI Per Game] = 
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+    IF(TotalGames > 0,
+       DIVIDE(TotalRBI, TotalGames, 0),
+       BLANK())
+
+MEASURE 'boxscore'[Strikeout Rate] = 
+VAR TotalStrikeouts = SUM(boxscore[strikeouts])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+    IF(TotalAtBats > 0,
+       DIVIDE(TotalStrikeouts, TotalAtBats, 0),
+       BLANK())
+
+MEASURE 'boxscore'[Walk Rate] = 
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+    IF(PlateAppearances > 0,
+       DIVIDE(TotalWalks, PlateAppearances, 0),
+       BLANK())
+
+// =====================================================
+// TEAM-LEVEL AGGREGATIONS
+// =====================================================
+
+MEASURE 'boxscore'[Team Total Runs] = 
+CALCULATE(
+    SUM(boxscore[runs])
+)
+
+MEASURE 'boxscore'[Team Batting Average] = 
+VAR TeamHits = CALCULATE(SUM(boxscore[hits]))
+VAR TeamAtBats = CALCULATE(SUM(boxscore[at_bats]))
+RETURN 
+    IF(TeamAtBats > 0,
+       DIVIDE(TeamHits, TeamAtBats, 0),
+       BLANK())
+
+MEASURE 'boxscore'[Team Total RBI] = 
+CALCULATE(
+    SUM(boxscore[rbi])
+)
+
+MEASURE 'boxscore'[Team Strikeout Rate] = 
+VAR TeamStrikeouts = CALCULATE(SUM(boxscore[strikeouts]))
+VAR TeamAtBats = CALCULATE(SUM(boxscore[at_bats]))
+RETURN 
+    IF(TeamAtBats > 0,
+       DIVIDE(TeamStrikeouts, TeamAtBats, 0),
+       BLANK())
+
+// =====================================================
+// PLAYER-LEVEL AGGREGATIONS
+// =====================================================
+
+MEASURE 'boxscore'[Player Games Played] = 
+DISTINCTCOUNT(boxscore[game_id])
+
+MEASURE 'boxscore'[Player Season Summary] = 
+VAR PlayerHits = SUM(boxscore[hits])
+VAR PlayerAtBats = SUM(boxscore[at_bats])
+VAR PlayerRuns = SUM(boxscore[runs])
+VAR PlayerRBI = SUM(boxscore[rbi])
+VAR PlayerBattingAvg = IF(PlayerAtBats > 0, DIVIDE(PlayerHits, PlayerAtBats, 0), 0)
+RETURN 
+    "Games: " & 'boxscore'[Player Games Played] & 
+    " | AVG: " & FORMAT(PlayerBattingAvg, "0.000") &
+    " | H: " & PlayerHits &
+    " | R: " & PlayerRuns &
+    " | RBI: " & PlayerRBI
+
+// =====================================================
+// COMPARATIVE boxscore
+// =====================================================
+
+MEASURE 'boxscore'[Batting Average vs League] = 
+VAR PlayerAvg = 'boxscore'[Batting Average]
+VAR LeagueAvg = CALCULATE(
+    'boxscore'[Batting Average],
+    ALL(players),
+    ALL(teams)
+)
+RETURN 
+    IF(NOT ISBLANK(PlayerAvg) && NOT ISBLANK(LeagueAvg),
+       PlayerAvg - LeagueAvg,
+       BLANK())
+
+MEASURE 'boxscore'[Team Runs Rank] = 
+RANKX(
+    ALL(teams),
+    'boxscore'[Team Total Runs],
+    ,
+    DESC
+)
+
+MEASURE 'boxscore'[Player Hits Rank] = 
+RANKX(
+    ALL(players),
+    'boxscore'[Total Hits],
+    ,
+    DESC
+)
+
+// =====================================================
+// ADVANCED METRICS
+// =====================================================
+
+MEASURE 'boxscore'[Slugging Percentage Estimate] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+// Simplified: assuming 1.5x multiplier for estimated extra base hits
+VAR EstimatedTotalBases = TotalHits * 1.5
+RETURN 
+    IF(TotalAtBats > 0,
+       DIVIDE(EstimatedTotalBases, TotalAtBats, 0),
+       BLANK())
+
+MEASURE 'boxscore'[OPS] = 
+'boxscore'[On Base Percentage] + 'boxscore'[Slugging Percentage Estimate]
+
+MEASURE 'boxscore'[Clutch Performance] = 
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalHits = SUM(boxscore[hits])
+RETURN 
+    IF(TotalHits > 0,
+       DIVIDE(TotalRBI, TotalHits, 0),
+       BLANK())
+
+// =====================================================
+// PERFORMANCE CATEGORIES
+// =====================================================
+
+MEASURE 'boxscore'[Player Category] = 
+VAR BattingAvg = 'boxscore'[Batting Average]
+VAR TotalHits = 'boxscore'[Total Hits]
+VAR Games = 'boxscore'[Player Games Played]
+RETURN 
+    SWITCH(
+        TRUE(),
+        BattingAvg >= 0.300 && TotalHits >= 150, "⭐ All-Star",
+        BattingAvg >= 0.275 && TotalHits >= 100, "🌟 Above Average",
+        BattingAvg >= 0.250 && Games >= 50, "📊 Average",
+        BattingAvg >= 0.200, "📉 Below Average",
+        "🚨 Struggling"
+    )
+
+MEASURE 'boxscore'[Team Strength] = 
+VAR TeamAvg = 'boxscore'[Team Batting Average]
+VAR TeamRuns = 'boxscore'[Team Total Runs]
+VAR GamesPlayed = CALCULATE(DISTINCTCOUNT(games[game_id]))
+VAR RunsPerGame = DIVIDE(TeamRuns, GamesPlayed, 0)
+RETURN 
+    SWITCH(
+        TRUE(),
+        TeamAvg >= 0.280 && RunsPerGame >= 5.5, "🏆 Elite",
+        TeamAvg >= 0.260 && RunsPerGame >= 4.8, "💪 Strong", 
+        TeamAvg >= 0.240 && RunsPerGame >= 4.2, "⚖️ Average",
+        TeamAvg >= 0.220, "📉 Weak",
+        "🆘 Poor"
+    )
+
+// =====================================================
+// SUMMARY STATISTICS
+// =====================================================
+
+MEASURE 'boxscore'[Boxscore Summary] = 
+VAR Stats = 
+    "BATTING STATISTICS" & UNICHAR(10) &
+    "=================" & UNICHAR(10) &
+    "At Bats: " & FORMAT('boxscore'[Total At Bats], "#,0") & UNICHAR(10) &
+    "Hits: " & FORMAT('boxscore'[Total Hits], "#,0") & UNICHAR(10) &
+    "Runs: " & FORMAT('boxscore'[Total Runs], "#,0") & UNICHAR(10) &
+    "RBI: " & FORMAT('boxscore'[Total RBI], "#,0") & UNICHAR(10) &
+    "Walks: " & FORMAT('boxscore'[Total Walks], "#,0") & UNICHAR(10) &
+    "Strikeouts: " & FORMAT('boxscore'[Total Strikeouts], "#,0") & UNICHAR(10) &
+    UNICHAR(10) &
+    "CALCULATED METRICS" & UNICHAR(10) &
+    "=================" & UNICHAR(10) &
+    "Batting Average: " & FORMAT('boxscore'[Batting Average], "0.000") & UNICHAR(10) &
+    "On Base %: " & FORMAT('boxscore'[On Base Percentage], "0.000") & UNICHAR(10) &
+    "Strikeout Rate: " & FORMAT('boxscore'[Strikeout Rate], "0.0%") & UNICHAR(10) &
+    "Walk Rate: " & FORMAT('boxscore'[Walk Rate], "0.0%") & UNICHAR(10) &
+    "Runs/Game: " & FORMAT('boxscore'[Runs Per Game], "0.00") & UNICHAR(10) &
+    "RBI/Game: " & FORMAT('boxscore'[RBI Per Game], "0.00")
+RETURN Stats
+
+// =====================================================
+// CONDITIONAL FORMATTING
+// =====================================================
+
+MEASURE 'boxscore'[BA Color] = 
+VAR BattingAvg = 'boxscore'[Batting Average]
+RETURN 
+    SWITCH(
+        TRUE(),
+        BattingAvg >= 0.300, "#2E7D32",  // Green for excellent
+        BattingAvg >= 0.275, "#FFA000",  // Orange for good
+        BattingAvg >= 0.250, "#F57C00",  // Yellow for average
+        "#D32F2F"                        // Red for below average
+    )
+
+// =====================================================
+// EXECUTIVE SUMMARY
+// =====================================================
+
+MEASURE 'boxscore'[Executive Summary] = 
+VAR TopPlayer = 
+    MAXX(
+        TOPN(1, ALL(players), 'boxscore'[Total Hits], DESC),
+        players[player_name]
+    )
+VAR TopTeam = 
+    MAXX(
+        TOPN(1, ALL(teams), 'boxscore'[Team Total Runs], DESC),
+        teams[team_name]
+    )
+RETURN 
+    "SEASON EXECUTIVE SUMMARY" & UNICHAR(10) &
+    "=======================" & UNICHAR(10) &
+    "Top Hitter: " & TopPlayer & UNICHAR(10) &
+    "Top Offensive Team: " & TopTeam & UNICHAR(10) &
+    "League Batting Avg: " & FORMAT(CALCULATE('boxscore'[Batting Average], ALL()), "0.000") & UNICHAR(10) &
+    "Total Games Analyzed: " & FORMAT(DISTINCTCOUNT(boxscore[game_id]), "#,0")
+
+// =====================================================
+// END OF boxscore
+// =====================================================
+// Copy each MEASURE block above individually into Power BI Desktop
+// 1. Go to Modeling tab → New Measure
+// 2. Paste each measure one by one
+// 3. Adjust table names to match your model

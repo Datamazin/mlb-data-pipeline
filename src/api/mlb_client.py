@@ -1,0 +1,52 @@
+import requests
+
+
+class MLBClient:
+    def __init__(self, base_url="https://statsapi.mlb.com/api/v1"):
+        self.base_url = base_url
+
+    def fetch_boxscore(self, game_id):
+        # MLB Stats API endpoint for boxscore
+        response = requests.get(f"{self.base_url}/game/{game_id}/boxscore")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
+
+    def fetch_game_data(self, game_id):
+        # MLB Stats API endpoint for linescore (contains game summary data)
+        response = requests.get(f"{self.base_url}/game/{game_id}/linescore")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
+            
+    def fetch_game_feed(self, game_id):
+        # MLB Stats API endpoint for complete game feed
+        response = requests.get(f"{self.base_url}/game/{game_id}/feed/live")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
+    
+    def fetch_schedule(self, start_date, end_date, sport_id=1):
+        """
+        Fetch MLB schedule for a date range.
+        
+        Args:
+            start_date: Start date in YYYY-MM-DD format
+            end_date: End date in YYYY-MM-DD format  
+            sport_id: Sport ID (1 for MLB)
+        """
+        url = f"{self.base_url}/schedule"
+        params = {
+            'startDate': start_date,
+            'endDate': end_date,
+            'sportId': sport_id,
+            'hydrate': 'team,linescore'
+        }
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()

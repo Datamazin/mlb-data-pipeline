@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "mlb-sql-datapipeline"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "703269bb-5ff3-4dae-8b93-b05d4aa8b776"
+  }
+}

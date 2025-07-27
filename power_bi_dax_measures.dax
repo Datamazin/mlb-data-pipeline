@@ -1,0 +1,276 @@
+// =====================================================
+// MLB Boxscore Summary DAX Measures
+// =====================================================
+// This file contains DAX measures to summarize all boxscore fields
+// for use in Power BI semantic model - Copy each MEASURE block separately
+
+// =====================================================
+// BASIC BATTING STATISTICS
+// =====================================================
+
+MEASURE 'Measures'[Total At Bats] = 
+SUM(boxscore[at_bats])
+
+MEASURE 'Measures'[Total Runs] = 
+SUM(boxscore[runs])
+
+MEASURE 'Measures'[Total Hits] = 
+SUM(boxscore[hits])
+
+MEASURE 'Measures'[Total RBI] = 
+SUM(boxscore[rbi])
+
+MEASURE 'Measures'[Total Walks] = 
+SUM(boxscore[walks])
+
+MEASURE 'Measures'[Total Strikeouts] = 
+SUM(boxscore[strikeouts])
+
+// =====================================================
+// CALCULATED BATTING STATISTICS
+// =====================================================
+
+MEASURE 'Measures'[Batting Average] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+    IF(TotalAtBats > 0, 
+       DIVIDE(TotalHits, TotalAtBats, 0), 
+       BLANK())
+
+MEASURE 'Measures'[On Base Percentage] = 
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+    IF(PlateAppearances > 0,
+       DIVIDE(TotalHits + TotalWalks, PlateAppearances, 0),
+       BLANK())
+
+MEASURE 'Measures'[Runs Per Game] = 
+VAR TotalRuns = SUM(boxscore[runs])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+    IF(TotalGames > 0,
+       DIVIDE(TotalRuns, TotalGames, 0),
+       BLANK())
+
+MEASURE 'Measures'[RBI Per Game] = 
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalGames = DISTINCTCOUNT(boxscore[game_id])
+RETURN 
+    IF(TotalGames > 0,
+       DIVIDE(TotalRBI, TotalGames, 0),
+       BLANK())
+
+MEASURE 'Measures'[Strikeout Rate] = 
+VAR TotalStrikeouts = SUM(boxscore[strikeouts])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+RETURN 
+    IF(TotalAtBats > 0,
+       DIVIDE(TotalStrikeouts, TotalAtBats, 0),
+       BLANK())
+
+MEASURE 'Measures'[Walk Rate] = 
+VAR TotalWalks = SUM(boxscore[walks])
+VAR TotalAtBats = SUM(boxscore[at_bats])
+VAR PlateAppearances = TotalAtBats + TotalWalks
+RETURN 
+    IF(PlateAppearances > 0,
+       DIVIDE(TotalWalks, PlateAppearances, 0),
+       BLANK())
+
+// =====================================================
+// TEAM-LEVEL AGGREGATIONS
+// =====================================================
+
+MEASURE 'Measures'[Team Total Runs] = 
+CALCULATE(
+    SUM(boxscore[runs]),
+    USERELATIONSHIP(teams[team_id], boxscore[team_id])
+)
+
+MEASURE 'Measures'[Team Batting Average] = 
+VAR TeamHits = CALCULATE(SUM(boxscore[hits]))
+VAR TeamAtBats = CALCULATE(SUM(boxscore[at_bats]))
+RETURN 
+    IF(TeamAtBats > 0,
+       DIVIDE(TeamHits, TeamAtBats, 0),
+       BLANK())
+
+MEASURE 'Measures'[Team Total RBI] = 
+CALCULATE(
+    SUM(boxscore[rbi]),
+    USERELATIONSHIP(teams[team_id], boxscore[team_id])
+)
+
+MEASURE 'Measures'[Team Strikeout Rate] = 
+VAR TeamStrikeouts = CALCULATE(SUM(boxscore[strikeouts]))
+VAR TeamAtBats = CALCULATE(SUM(boxscore[at_bats]))
+RETURN 
+    IF(TeamAtBats > 0,
+       DIVIDE(TeamStrikeouts, TeamAtBats, 0),
+       BLANK())
+
+// =====================================================
+// PLAYER-LEVEL AGGREGATIONS
+// =====================================================
+
+MEASURE 'Measures'[Player Games Played] = 
+DISTINCTCOUNT(boxscore[game_id])
+
+MEASURE 'Measures'[Player Season Summary] = 
+VAR PlayerHits = SUM(boxscore[hits])
+VAR PlayerAtBats = SUM(boxscore[at_bats])
+VAR PlayerRuns = SUM(boxscore[runs])
+VAR PlayerRBI = SUM(boxscore[rbi])
+VAR PlayerBattingAvg = IF(PlayerAtBats > 0, DIVIDE(PlayerHits, PlayerAtBats, 0), 0)
+RETURN 
+    "Games: " & 'Measures'[Player Games Played] & 
+    " | AVG: " & FORMAT(PlayerBattingAvg, "0.000") &
+    " | H: " & PlayerHits &
+    " | R: " & PlayerRuns &
+    " | RBI: " & PlayerRBI
+
+-- =====================================================
+-- TIME-BASED AGGREGATIONS
+-- =====================================================
+
+-- Monthly Runs
+Monthly Runs = 
+CALCULATE(
+    SUM(FACT_BOXSCORE[runs]),
+    DATESMTD(DIM_DATE[full_date])
+)
+
+-- Year-to-Date Hits
+YTD Hits = 
+CALCULATE(
+    SUM(FACT_BOXSCORE[hits]),
+    DATESYTD(DIM_DATE[full_date])
+)
+
+-- Season-to-Date Batting Average
+Season Batting Average = 
+VAR SeasonHits = CALCULATE(
+    SUM(FACT_BOXSCORE[hits]),
+    DATESYTD(DIM_DATE[full_date])
+)
+VAR SeasonAtBats = CALCULATE(
+    SUM(FACT_BOXSCORE[at_bats]),
+    DATESYTD(DIM_DATE[full_date])
+)
+RETURN 
+    IF(SeasonAtBats > 0,
+       DIVIDE(SeasonHits, SeasonAtBats, 0),
+       BLANK())
+
+// =====================================================
+// COMPARATIVE MEASURES
+// =====================================================
+
+MEASURE 'Measures'[Batting Average vs League] = 
+VAR PlayerAvg = 'Measures'[Batting Average]
+VAR LeagueAvg = CALCULATE(
+    'Measures'[Batting Average],
+    ALL(players),
+    ALL(teams)
+)
+RETURN 
+    IF(NOT ISBLANK(PlayerAvg) && NOT ISBLANK(LeagueAvg),
+       PlayerAvg - LeagueAvg,
+       BLANK())
+
+MEASURE 'Measures'[Team Runs Rank] = 
+RANKX(
+    ALL(teams),
+    'Measures'[Team Total Runs],
+    ,
+    DESC
+)
+
+MEASURE 'Measures'[Player Hits Rank] = 
+RANKX(
+    ALL(players),
+    'Measures'[Total Hits],
+    ,
+    DESC
+)
+
+-- =====================================================
+-- PERFORMANCE INDICATORS
+-- =====================================================
+
+-- Hot/Cold Streak Indicator
+Performance Indicator = 
+VAR Recent5GamesAvg = CALCULATE(
+    [Batting Average],
+    TOPN(5, 
+         RELATEDTABLE(FACT_BOXSCORE),
+         FACT_BOXSCORE[created_at],
+         DESC)
+)
+VAR SeasonAvg = [Season Batting Average]
+RETURN 
+    SWITCH(
+        TRUE(),
+        Recent5GamesAvg > SeasonAvg + 0.050, "🔥 Hot",
+        Recent5GamesAvg < SeasonAvg - 0.050, "🧊 Cold",
+        "📊 Average"
+    )
+
+// =====================================================
+// SUMMARY STATISTICS
+// =====================================================
+
+MEASURE 'Measures'[Boxscore Summary] = 
+VAR Stats = 
+    "BATTING STATISTICS" & UNICHAR(10) &
+    "=================" & UNICHAR(10) &
+    "At Bats: " & FORMAT('Measures'[Total At Bats], "#,0") & UNICHAR(10) &
+    "Hits: " & FORMAT('Measures'[Total Hits], "#,0") & UNICHAR(10) &
+    "Runs: " & FORMAT('Measures'[Total Runs], "#,0") & UNICHAR(10) &
+    "RBI: " & FORMAT('Measures'[Total RBI], "#,0") & UNICHAR(10) &
+    "Walks: " & FORMAT('Measures'[Total Walks], "#,0") & UNICHAR(10) &
+    "Strikeouts: " & FORMAT('Measures'[Total Strikeouts], "#,0") & UNICHAR(10) &
+    UNICHAR(10) &
+    "CALCULATED METRICS" & UNICHAR(10) &
+    "=================" & UNICHAR(10) &
+    "Batting Average: " & FORMAT('Measures'[Batting Average], "0.000") & UNICHAR(10) &
+    "On Base %: " & FORMAT('Measures'[On Base Percentage], "0.000") & UNICHAR(10) &
+    "Strikeout Rate: " & FORMAT('Measures'[Strikeout Rate], "0.0%") & UNICHAR(10) &
+    "Walk Rate: " & FORMAT('Measures'[Walk Rate], "0.0%") & UNICHAR(10) &
+    "Runs/Game: " & FORMAT('Measures'[Runs Per Game], "0.00") & UNICHAR(10) &
+    "RBI/Game: " & FORMAT('Measures'[RBI Per Game], "0.00")
+RETURN Stats
+
+MEASURE 'Measures'[BA Color] = 
+VAR BattingAvg = 'Measures'[Batting Average]
+RETURN 
+    SWITCH(
+        TRUE(),
+        BattingAvg >= 0.300, "#2E7D32",  // Green for excellent
+        BattingAvg >= 0.275, "#FFA000",  // Orange for good
+        BattingAvg >= 0.250, "#F57C00",  // Yellow for average
+        "#D32F2F"                        // Red for below average
+    )
+
+-- Performance Arrow
+Performance Arrow = 
+VAR CurrentAvg = [Batting Average]
+VAR PreviousAvg = CALCULATE(
+    [Batting Average],
+    DATEADD(DIM_DATE[full_date], -30, DAY)
+)
+RETURN 
+    SWITCH(
+        TRUE(),
+        CurrentAvg > PreviousAvg + 0.020, "↗️ Improving",
+        CurrentAvg < PreviousAvg - 0.020, "↘️ Declining", 
+        "➡️ Stable"
+    )
+
+-- =====================================================
+-- END OF DAX MEASURES
+-- =====================================================

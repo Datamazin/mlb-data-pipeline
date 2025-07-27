@@ -1,0 +1,133 @@
+table games
+	lineageTag: 45a817c3-c991-4328-9f31-8824fb8719d1
+
+	column game_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 3fe5510a-138f-4778-b04d-f6ac332e3d3f
+		summarizeBy: none
+		sourceColumn: game_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column game_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a9978553-5072-4c9d-ac2c-62395a301a95
+		summarizeBy: none
+		sourceColumn: game_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column home_team_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 6344e93d-b4b8-48ba-8e1a-4b35624fca90
+		summarizeBy: sum
+		sourceColumn: home_team_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column away_team_id
+		dataType: int64
+		formatString: 0
+		lineageTag: f14659eb-ccba-4c0b-92d1-3a2f34e5bf39
+		summarizeBy: sum
+		sourceColumn: away_team_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column home_score
+		dataType: int64
+		formatString: 0
+		lineageTag: b8dc58ba-3104-48cf-970f-2b49d6d2aeb0
+		summarizeBy: sum
+		sourceColumn: home_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column away_score
+		dataType: int64
+		formatString: 0
+		lineageTag: b51fbc16-687e-4f41-bbe6-b54431832b58
+		summarizeBy: sum
+		sourceColumn: away_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column inning
+		dataType: int64
+		formatString: 0
+		lineageTag: b73f4e65-1a5a-4eea-8cf5-f73a71b7020b
+		summarizeBy: sum
+		sourceColumn: inning
+
+		annotation SummarizationSetBy = Automatic
+
+	column inning_state
+		dataType: string
+		lineageTag: fceb921d-fa5a-44b1-960f-f9e2ba6e13b7
+		summarizeBy: none
+		sourceColumn: inning_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column game_status
+		dataType: string
+		lineageTag: 4b960a8e-1dba-4ba0-a9b2-136d6b629992
+		summarizeBy: none
+		sourceColumn: game_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ae55542b-e9a0-4d33-b1a3-a8e66333abe4
+		summarizeBy: none
+		sourceColumn: created_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column game_type
+		dataType: string
+		lineageTag: 140f4a0d-87d6-4827-943d-c5bc668f91b4
+		summarizeBy: none
+		sourceColumn: game_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column series_description
+		dataType: string
+		lineageTag: 67b63972-b621-432d-8939-afd612e98a89
+		summarizeBy: none
+		sourceColumn: series_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column official_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 23e2c445-3e9c-4398-a935-925e87a1d7a3
+		summarizeBy: none
+		sourceColumn: official_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition games = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "mlb_data"),
+				    dbo_games = Source{[Schema="dbo",Item="games"]}[Data]
+				in
+				    dbo_games
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

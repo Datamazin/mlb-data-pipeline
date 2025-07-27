@@ -1,0 +1,36 @@
+relationship 3c305052-2c3a-4ca8-a92f-31cdc1274c01
+	isActive: false
+	fromColumn: games.away_team_id
+	toColumn: teams.team_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship 16d6c150-6262-4242-9738-b93e0dbb6dfc
+	isActive: false
+	fromColumn: games.home_team_id
+	toColumn: teams.team_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship 664408f0-19e5-4600-ae5b-281eedcb1977
+	fromColumn: boxscore.game_id
+	toColumn: games.game_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship 6686fccc-996e-42a8-a9e7-6d79cbdc2386
+	fromColumn: boxscore.player_id
+	toColumn: players.player_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship 310fad5b-aa8a-4685-b449-954b3aa2946b
+	fromColumn: boxscore.team_id
+	toColumn: teams.team_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship fe62c347-c33b-7b78-312f-21c6c7b21de1
+	fromColumn: games.game_date
+	toColumn: Date.Date
+

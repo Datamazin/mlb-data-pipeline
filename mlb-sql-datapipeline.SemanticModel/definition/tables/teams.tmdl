@@ -1,0 +1,66 @@
+table teams
+	lineageTag: e9555dcc-17c2-49ce-ba72-af2bc5b91d7b
+
+	column team_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b3b36f8-0c11-46bf-a9a3-03f3fbbedcf5
+		summarizeBy: none
+		sourceColumn: team_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column team_name
+		dataType: string
+		lineageTag: d626fe8a-434d-4d02-bd13-d08b4dbdab3c
+		summarizeBy: none
+		sourceColumn: team_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column abbreviation
+		dataType: string
+		lineageTag: f303c471-9eed-468a-a801-f6d67ec7c0bc
+		summarizeBy: none
+		sourceColumn: abbreviation
+
+		annotation SummarizationSetBy = Automatic
+
+	column league
+		dataType: string
+		lineageTag: 144de9c5-5ae0-4355-9fd3-b2e5a406c835
+		summarizeBy: none
+		sourceColumn: league
+
+		annotation SummarizationSetBy = Automatic
+
+	column division
+		dataType: string
+		lineageTag: bf7ebf26-3f46-4ba4-a489-a440297d644a
+		summarizeBy: none
+		sourceColumn: division
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f85c3b1c-aba9-4c6b-999e-084de553bc2b
+		summarizeBy: none
+		sourceColumn: created_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition teams = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "mlb_data"),
+				    dbo_teams = Source{[Schema="dbo",Item="teams"]}[Data]
+				in
+				    dbo_teams
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

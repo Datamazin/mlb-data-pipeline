@@ -1,0 +1,280 @@
+table boxscore
+	lineageTag: a942b220-33e0-4e04-a2f0-25aacd06c40e
+
+	measure AB = Sum(boxscore[at_bats])
+		formatString: #,0
+		lineageTag: 13c57148-4197-45fc-8a51-b630ee5461f8
+
+	measure R =
+			
+			SUM(boxscore[runs])
+		formatString: #,0
+		lineageTag: f14dccac-761e-40cb-a91a-24eb4df80901
+
+	measure H = ```
+			
+			SUM(boxscore[hits])
+			
+			
+			```
+		formatString: 0
+		lineageTag: 17efa1a0-f9e7-461c-b1c6-8331d21d7e96
+
+	measure (RBI) = ```
+			
+			SUM(boxscore[rbi])
+			
+			
+			```
+		formatString: 0
+		lineageTag: 4c1a4561-0cb5-4f54-a619-0b0406cc4746
+
+	measure BB = ```
+			
+			SUM(boxscore[walks])
+			
+			
+			```
+		formatString: 0
+		lineageTag: ce16532f-e689-437a-80f7-0b51704f7fb4
+
+	measure SO = ```
+			
+			SUM(boxscore[strikeouts])
+			
+			```
+		formatString: 0
+		lineageTag: 653518eb-74c2-439d-bf4d-5d0c68051d39
+
+	measure OBP = ```
+			
+			VAR TotalHits = SUM(boxscore[hits])
+			VAR TotalWalks = SUM(boxscore[walks])
+			VAR TotalAtBats = SUM(boxscore[at_bats])
+			VAR PlateAppearances = TotalAtBats + TotalWalks
+			RETURN 
+			    IF(PlateAppearances > 0,
+			       DIVIDE(TotalHits + TotalWalks, PlateAppearances, 0),
+			       BLANK())
+			```
+		formatString: 0.000
+		lineageTag: 4024277c-698e-4fe7-af4e-f91f99de40a2
+
+	measure AVG = ```
+			
+			VAR TotalHits = SUM(boxscore[hits])
+			VAR TotalAtBats = SUM(boxscore[at_bats])
+			RETURN 
+			    IF(TotalAtBats > 0, 
+			       DIVIDE(TotalHits, TotalAtBats, 0), 
+			       BLANK())
+			```
+		formatString: 0.000
+		lineageTag: ed936c8c-52d3-4c90-83ec-e99686bed6e9
+
+	measure HR = ```
+			
+			SUM(boxscore[home_runs])
+			
+			
+			```
+		formatString: 0
+		lineageTag: e0b36e7b-18c7-4e0d-8e3b-b9b35b71309d
+
+	measure 2B = ```
+			
+			SUM(boxscore[doubles])
+			
+			
+			```
+		formatString: 0
+		lineageTag: 8f2e7f6f-bbab-488c-a598-00f1c98f1433
+
+	measure 3B = ```
+			
+			SUM(boxscore[triples])
+			
+			
+			```
+		formatString: 0
+		lineageTag: 243b748f-646c-44a9-801d-5cbbfab28651
+
+	column id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ed592b21-0a41-4d34-812c-ad4177357fad
+		summarizeBy: sum
+		sourceColumn: id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column game_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5cb79094-20e4-42de-b66c-a817e81775e8
+		summarizeBy: none
+		sourceColumn: game_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column player_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: da100eea-5fb9-4aaf-94fe-826fd09461b1
+		summarizeBy: none
+		sourceColumn: player_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column team_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c2803c00-5555-41ef-b5f6-6dadfaa0f1d2
+		summarizeBy: none
+		sourceColumn: team_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column at_bats
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 80308ec0-deaf-4cba-af16-0c9da1def3ff
+		summarizeBy: sum
+		sourceColumn: at_bats
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column runs
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ef648c3a-911d-4b11-8d2b-c6988b8fcff2
+		summarizeBy: sum
+		sourceColumn: runs
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column hits
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7e69dcaf-e6cb-47bb-9675-5734e8c6259a
+		summarizeBy: sum
+		sourceColumn: hits
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column rbi
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8c195d06-1f39-483c-94d8-46f5172a8441
+		summarizeBy: sum
+		sourceColumn: rbi
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column walks
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: e2a0656f-de56-480f-9c9a-0d55fe03e44b
+		summarizeBy: sum
+		sourceColumn: walks
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column strikeouts
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 28f5a610-a8d6-472f-b7a4-90016aa6ab7c
+		summarizeBy: sum
+		sourceColumn: strikeouts
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: fa370b0d-6e37-477a-9962-f7253e0c0026
+		summarizeBy: none
+		sourceColumn: created_at
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column doubles
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 72a1467c-a248-4d25-b8ee-c8dee6873b17
+		summarizeBy: sum
+		sourceColumn: doubles
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column triples
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8007c669-995c-46d6-a9bc-67aecf70c890
+		summarizeBy: sum
+		sourceColumn: triples
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column home_runs
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 661a992c-f82e-4ff0-8cdc-7d40f49bbc13
+		summarizeBy: sum
+		sourceColumn: home_runs
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition boxscore = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "mlb_data"),
+				    dbo_boxscore = Source{[Schema="dbo",Item="boxscore"]}[Data]
+				in
+				    dbo_boxscore
+
+	annotation PBI_ResultType = Table
+

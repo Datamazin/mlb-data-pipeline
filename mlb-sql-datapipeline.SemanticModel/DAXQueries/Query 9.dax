@@ -1,0 +1,8 @@
+// Write your formula below, select 'Run' to try it out. When ready, select 'Update model' to add the measure to your model.
+DEFINE
+	MEASURE 'boxscore'[New Measure] = COUNTROWS('boxscore')
+
+EVALUATE
+	SUMMARIZECOLUMNS(
+		"New Measure", [New Measure]
+	)

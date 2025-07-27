@@ -1,0 +1,4 @@
+DEFINE
+
+MEASURE 'boxscore'[Total Runs] = 
+SUM(boxscore[runs])
