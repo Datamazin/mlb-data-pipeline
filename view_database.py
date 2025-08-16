@@ -35,21 +35,21 @@ def view_database_data():
             print(f"  {team[0]:>3} | {team[1]:<25} | {team[2]:<4} | {team[3]}")
         
         # Games
-        print(f"\n🏟️  GAMES:")
-        games = conn.execute(text("""
-            SELECT g.game_id, g.game_date, 
-                   ht.team_name as home_team, g.home_score,
-                   at.team_name as away_team, g.away_score,
-                   g.inning, g.inning_state, g.game_status
-            FROM games g
-            LEFT JOIN teams ht ON g.home_team_id = ht.team_id  
-            LEFT JOIN teams at ON g.away_team_id = at.team_id
-            ORDER BY g.game_date DESC
-        """)).fetchall()
+        # print(f"\n🏟️  GAMES:")
+        # games = conn.execute(text("""
+        #     SELECT g.game_id, g.game_date, 
+        #            ht.team_name as home_team, g.home_score,
+        #            at.team_name as away_team, g.away_score,
+        #            g.inning, g.inning_state, g.game_status
+        #     FROM games g
+        #     LEFT JOIN teams ht ON g.home_team_id = ht.team_id  
+        #     LEFT JOIN teams at ON g.away_team_id = at.team_id
+        #     ORDER BY g.game_date DESC
+        # """)).fetchall()
         
-        for game in games:
-            print(f"  Game {game[0]} | {game[1]} | {game[2] or 'TBD'} {game[3]} - {game[5]} {game[4] or 'TBD'}")
-            print(f"    Inning: {game[6]} {game[7]} | Status: {game[8]}")
+        # for game in games:
+        #     print(f"  Game {game[0]} | {game[1]} | {game[2] or 'TBD'} {game[3]} - {game[5]} {game[4] or 'TBD'}")
+        #     print(f"    Inning: {game[6]} {game[7]} | Status: {game[8]}")
         
         # Top Players by Stats
         print(f"\n⚾ TOP PLAYERS BY HITS:")

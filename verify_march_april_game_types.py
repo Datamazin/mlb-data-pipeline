@@ -35,6 +35,12 @@ def verify_march_april_game_types():
         
         total_games = sum(row[1] for row in result)
         
+        if total_games == 0:
+            print(f"   ❌ No games found in March & April 2025")
+            print(f"   💡 This may indicate that the games table needs to be populated first")
+            print(f"   📅 Expected date range: 2025-03-01 to 2025-04-30")
+            return
+        
         game_type_names = {
             'R': 'Regular Season',
             'S': 'Spring Training', 
@@ -131,11 +137,17 @@ def verify_march_april_game_types():
         min_date, max_date, total = date_check
         print(f"   📅 Date range: {min_date} to {max_date} ({total} games)")
         
-        if min_date >= datetime.strptime('2025-03-01', '%Y-%m-%d').date() and \
-           max_date <= datetime.strptime('2025-04-30', '%Y-%m-%d').date():
-            print(f"   ✅ All games within expected date range")
+        if total == 0:
+            print(f"   ❌ No games found in the specified date range")
+        elif min_date and max_date:
+            start_date = datetime.strptime('2025-03-01', '%Y-%m-%d').date()
+            end_date = datetime.strptime('2025-04-30', '%Y-%m-%d').date()
+            if min_date >= start_date and max_date <= end_date:
+                print(f"   ✅ All games within expected date range")
+            else:
+                print(f"   ⚠️  Some games outside expected date range")
         else:
-            print(f"   ⚠️  Some games outside expected date range")
+            print(f"   ⚠️  Unable to verify date range (NULL dates returned)")
         
         # Check for reasonable game type distribution
         regular_season_count = db.fetch_results("""
@@ -150,8 +162,12 @@ def verify_march_april_game_types():
             print(f"   ⚠️  No Regular Season games found")
         
         print(f"\n🎉 VERIFICATION COMPLETE!")
-        print(f"✅ dbo.games table successfully repopulated with game type data")
-        print(f"✅ March & April 2025: {total_games} games with proper metadata")
+        if total > 0:
+            print(f"✅ dbo.games table successfully repopulated with game type data")
+            print(f"✅ March & April 2025: {total} games with proper metadata")
+        else:
+            print(f"❌ No games found in March & April 2025 date range")
+            print(f"💡 This may indicate that the games table needs to be populated first")
         
     except Exception as e:
         print(f"❌ Error during verification: {e}")

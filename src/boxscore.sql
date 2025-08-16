@@ -15,3 +15,4 @@ SELECT TOP (1000) [id]
       ,[created_at]
 
   FROM [mlb_data].[dbo].[boxscore]
+  
