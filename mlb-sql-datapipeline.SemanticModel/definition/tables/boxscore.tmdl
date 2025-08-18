@@ -17,7 +17,7 @@ table boxscore
 			
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: 17efa1a0-f9e7-461c-b1c6-8331d21d7e96
 
 	measure (RBI) = ```
@@ -26,7 +26,7 @@ table boxscore
 			
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: 4c1a4561-0cb5-4f54-a619-0b0406cc4746
 
 	measure BB = ```
@@ -35,7 +35,7 @@ table boxscore
 			
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: ce16532f-e689-437a-80f7-0b51704f7fb4
 
 	measure SO = ```
@@ -43,7 +43,7 @@ table boxscore
 			SUM(boxscore[strikeouts])
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: 653518eb-74c2-439d-bf4d-5d0c68051d39
 
 	measure OBP = ```
@@ -78,7 +78,7 @@ table boxscore
 			
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: e0b36e7b-18c7-4e0d-8e3b-b9b35b71309d
 
 	measure 2B = ```
@@ -87,7 +87,7 @@ table boxscore
 			
 			
 			```
-		formatString: 0
+		formatString: #,0
 		lineageTag: 8f2e7f6f-bbab-488c-a598-00f1c98f1433
 
 	measure 3B = ```
@@ -98,6 +98,71 @@ table boxscore
 			```
 		formatString: 0
 		lineageTag: 243b748f-646c-44a9-801d-5cbbfab28651
+
+	measure G = COUNT(boxscore[game_id])
+		formatString: #,0
+		lineageTag: c59ebc50-4fa1-44c1-ad52-6b41a37c90dc
+
+	measure 'Clutch Performance' = ```
+			
+			VAR TotalRBI = SUM(boxscore[rbi])
+			VAR TotalHits = SUM(boxscore[hits])
+			RETURN 
+			    IF(TotalHits > 0,
+			       DIVIDE(TotalRBI, TotalHits, 0),
+			       BLANK())
+			```
+		lineageTag: 1614c41a-dc81-491d-81fd-a72ff90dc588
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Run Production Rate' = ```
+			
+			VAR TotalRuns = SUM(boxscore[runs])
+			VAR TotalRBI = SUM(boxscore[rbi])
+			VAR TotalAtBats = SUM(boxscore[at_bats])
+			RETURN 
+			    IF(TotalAtBats > 0,
+			       DIVIDE(TotalRuns + TotalRBI, TotalAtBats, 0),
+			       BLANK())
+			```
+		lineageTag: c2aa7cfb-3f96-4b94-9689-0b52ede22d81
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Rolling 10 Game BA' = ```
+			
+			VAR Last10Games = 
+			    TOPN(10, 
+			         CALCULATETABLE(
+			             VALUES(boxscore[game_id]),
+			             ALLEXCEPT(boxscore, PLAYERS[player_id])
+			         ),
+			         RELATED(Date[Date],
+			         DESC)
+			RETURN 
+			    CALCULATE(
+			        [AVG],
+			        KEEPFILTERS(boxscore[game_id] IN Last10Games)
+			    )
+			```
+		lineageTag: 35d3bc2c-9c92-4ea7-858b-5e695f4b291c
+
+	measure 'Monthly Trend' = ```
+			
+			VAR CurrentMonth = [AVG]
+			VAR PriorMonth = CALCULATE(
+			    [AVG],
+			    DATEADD('Date'[Date], -1, MONTH)
+			)
+			VAR TrendDirection = CurrentMonth - PriorMonth
+			RETURN 
+			    IF(NOT ISBLANK(TrendDirection),
+			       IF(TrendDirection > 0.010, "📈 Rising",
+			          IF(TrendDirection < -0.010, "📉 Falling", "➡️ Stable")),
+			       "📊 N/A")
+			```
+		lineageTag: 1bff1a52-7651-459e-95d3-fb377599b0a6
 
 	column id
 		dataType: int64
@@ -264,6 +329,47 @@ table boxscore
 		sourceColumn: home_runs
 
 		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column game_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: b639b97f-f3e1-4a07-804f-3a289f1cc205
+		summarizeBy: none
+		sourceColumn: game_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column hit_by_pitch
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e52333c-7f91-464b-90ab-c771e0fc4283
+		summarizeBy: sum
+		sourceColumn: hit_by_pitch
+
+		annotation SummarizationSetBy = Automatic
+
+	column sacrifice_flies
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d976cbf-347c-4335-8804-13c2d06850be
+		summarizeBy: sum
+		sourceColumn: sacrifice_flies
+
+		annotation SummarizationSetBy = Automatic
+
+	column sacrifice_bunts
+		dataType: int64
+		formatString: 0
+		lineageTag: bbb29e83-4dbd-4a4b-8d3b-8eca289d3869
+		summarizeBy: sum
+		sourceColumn: sacrifice_bunts
 
 		annotation SummarizationSetBy = Automatic
 

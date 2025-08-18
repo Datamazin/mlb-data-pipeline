@@ -25,7 +25,7 @@ table games
 		dataType: int64
 		formatString: 0
 		lineageTag: 6344e93d-b4b8-48ba-8e1a-4b35624fca90
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: home_team_id
 
 		annotation SummarizationSetBy = Automatic
@@ -34,7 +34,7 @@ table games
 		dataType: int64
 		formatString: 0
 		lineageTag: f14659eb-ccba-4c0b-92d1-3a2f34e5bf39
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: away_team_id
 
 		annotation SummarizationSetBy = Automatic
@@ -43,7 +43,7 @@ table games
 		dataType: int64
 		formatString: 0
 		lineageTag: b8dc58ba-3104-48cf-970f-2b49d6d2aeb0
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: home_score
 
 		annotation SummarizationSetBy = Automatic
@@ -52,7 +52,7 @@ table games
 		dataType: int64
 		formatString: 0
 		lineageTag: b51fbc16-687e-4f41-bbe6-b54431832b58
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: away_score
 
 		annotation SummarizationSetBy = Automatic
@@ -61,7 +61,7 @@ table games
 		dataType: int64
 		formatString: 0
 		lineageTag: b73f4e65-1a5a-4eea-8cf5-f73a71b7020b
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: inning
 
 		annotation SummarizationSetBy = Automatic

@@ -9,8 +9,8 @@
 
 -- Slugging Percentage (requires additional data - using simplified version)
 Slugging Percentage Estimate = 
-VAR TotalHits = SUM(FACT_BOXSCORE[hits])
-VAR TotalAtBats = SUM(FACT_BOXSCORE[at_bats])
+VAR TotalHits = SUM(boxscore[hits])
+VAR TotalAtBats = SUM(boxscore[at_bats])
 -- Simplified: assuming 1.5x multiplier for estimated extra base hits
 VAR EstimatedTotalBases = TotalHits * 1.5
 RETURN 
@@ -35,8 +35,8 @@ RETURN
 
 -- Clutch Performance (RBI efficiency)
 Clutch Performance = 
-VAR TotalRBI = SUM(FACT_BOXSCORE[rbi])
-VAR TotalHits = SUM(FACT_BOXSCORE[hits])
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalHits = SUM(boxscore[hits])
 RETURN 
     IF(TotalHits > 0,
        DIVIDE(TotalRBI, TotalHits, 0),
@@ -44,9 +44,9 @@ RETURN
 
 -- Run Production Rate
 Run Production Rate = 
-VAR TotalRuns = SUM(FACT_BOXSCORE[runs])
-VAR TotalRBI = SUM(FACT_BOXSCORE[rbi])
-VAR TotalAtBats = SUM(FACT_BOXSCORE[at_bats])
+VAR TotalRuns = SUM(boxscore[runs])
+VAR TotalRBI = SUM(boxscore[rbi])
+VAR TotalAtBats = SUM(boxscore[at_bats])
 RETURN 
     IF(TotalAtBats > 0,
        DIVIDE(TotalRuns + TotalRBI, TotalAtBats, 0),
@@ -86,15 +86,15 @@ Rolling 10 Game BA =
 VAR Last10Games = 
     TOPN(10, 
          CALCULATETABLE(
-             VALUES(FACT_BOXSCORE[game_id]),
-             ALLEXCEPT(FACT_BOXSCORE, DIM_PLAYERS[player_id])
+             VALUES(boxscore[game_id]),
+             ALLEXCEPT(boxscore, DIM_PLAYERS[player_id])
          ),
          RELATED(DIM_DATE[full_date]),
          DESC)
 RETURN 
     CALCULATE(
         [Batting Average],
-        KEEPFILTERS(FACT_BOXSCORE[game_id] IN Last10Games)
+        KEEPFILTERS(boxscore[game_id] IN Last10Games)
     )
 
 -- Monthly Trend Indicator
@@ -198,10 +198,10 @@ RETURN
 BA Consistency = 
 VAR GameByGameBA = 
     ADDCOLUMNS(
-        SUMMARIZE(FACT_BOXSCORE, FACT_BOXSCORE[game_id]),
+        SUMMARIZE(boxscore, boxscore[game_id]),
         "GameBA", DIVIDE(
-            CALCULATE(SUM(FACT_BOXSCORE[hits])),
-            CALCULATE(SUM(FACT_BOXSCORE[at_bats]))
+            CALCULATE(SUM(boxscore[hits])),
+            CALCULATE(SUM(boxscore[at_bats]))
         )
     )
 VAR Variance = 
@@ -216,18 +216,18 @@ Current Streak =
 VAR Last5GamesHits = 
     SUMX(
         TOPN(5, 
-             RELATEDTABLE(FACT_BOXSCORE),
-             FACT_BOXSCORE[created_at],
+             RELATEDTABLE(boxscore),
+             boxscore[created_at],
              DESC),
-        FACT_BOXSCORE[hits]
+        boxscore[hits]
     )
 VAR Last5GamesAB = 
     SUMX(
         TOPN(5, 
-             RELATEDTABLE(FACT_BOXSCORE),
-             FACT_BOXSCORE[created_at],
+             RELATEDTABLE(boxscore),
+             boxscore[created_at],
              DESC),
-        FACT_BOXSCORE[at_bats]
+        boxscore[at_bats]
     )
 VAR Recent5GameBA = DIVIDE(Last5GamesHits, Last5GamesAB, 0)
 VAR SeasonBA = [Batting Average]
@@ -282,8 +282,9 @@ RETURN
     "Top Hitter: " & TopPlayer & UNICHAR(10) &
     "Top Offensive Team: " & TopTeam & UNICHAR(10) &
     "League Batting Avg: " & FORMAT(CALCULATE([Batting Average], ALL()), "0.000") & UNICHAR(10) &
-    "Total Games Analyzed: " & FORMAT(DISTINCTCOUNT(FACT_BOXSCORE[game_id]), "#,0")
+    "Total Games Analyzed: " & FORMAT(DISTINCTCOUNT(boxscore[game_id]), "#,0")
 
 -- =====================================================
 -- END ADVANCED MEASURES
 -- =====================================================
+

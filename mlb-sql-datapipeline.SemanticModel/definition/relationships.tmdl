@@ -30,7 +30,7 @@ relationship 310fad5b-aa8a-4685-b449-954b3aa2946b
 
 	annotation PBI_IsFromSource = FS
 
-relationship fe62c347-c33b-7b78-312f-21c6c7b21de1
-	fromColumn: games.game_date
+relationship 4fba3b53-d0c3-2836-1921-fbcda849580e
+	fromColumn: boxscore.game_date
 	toColumn: Date.Date
 

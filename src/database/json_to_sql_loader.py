@@ -38,7 +38,9 @@ class JSONToSQLLoader:
             if 'combined_data' in str(json_file_path):
                 return self._load_combined_data(data)
             elif 'boxscore_raw' in str(json_file_path):
-                return self._load_boxscore_data(data)
+                # Extract game_id from filename for boxscore files
+                game_id = self._extract_game_id_from_filename(json_file_path)
+                return self._load_boxscore_data(data, game_id)
             elif 'game_raw' in str(json_file_path):
                 return self._load_game_data(data)
             else:
@@ -87,23 +89,92 @@ class JSONToSQLLoader:
             # Transaction will be rolled back automatically on exception
             return False
 
-    def _load_boxscore_data(self, data):
+    def _extract_game_id_from_filename(self, filename):
+        """Extract game ID from filename like 'boxscore_raw_776762.json'."""
+        try:
+            import os
+            filename_only = os.path.basename(str(filename))
+            if '_' in filename_only:
+                parts = filename_only.split('_')
+                if len(parts) >= 3:
+                    # Extract number from last part before .json
+                    game_id_part = parts[-1].replace('.json', '')
+                    if game_id_part.isdigit():
+                        return int(game_id_part)
+        except Exception as e:
+            print(f"❌ Error extracting game_id from filename {filename}: {e}")
+        return None
+
+    def _fetch_game_metadata_if_needed(self, game_id):
+        """Fetch game metadata from MLB schedule API if needed."""
+        try:
+            if not hasattr(self, 'mlb_client'):
+                from src.api.mlb_client import MLBClient
+                self.mlb_client = MLBClient()
+            
+            print(f"🔍 Fetching game metadata for game {game_id}...")
+            metadata = self.mlb_client.fetch_game_metadata(game_id)
+            
+            if metadata:
+                print(f"✅ Found game metadata: type={metadata.get('game_type')}, series={metadata.get('series_description')}")
+                return metadata
+            else:
+                print(f"⚠️ No metadata found for game {game_id}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Error fetching game metadata for {game_id}: {e}")
+            return None
+
+    def _load_boxscore_data(self, data, game_id=None):
         """Load boxscore JSON data."""
         try:
-            # Extract game_id from filename or data
-            game_id = self._extract_game_id_from_data(data)
+            # Use provided game_id or try to extract from data
+            if game_id is None:
+                game_id = self._extract_game_id_from_data(data)
             
-            # Save raw JSON
-            self._save_raw_json(game_id, 'boxscore', json.dumps(data))
+            # If still no game_id, we can't proceed
+            if game_id is None:
+                print("❌ Could not extract game_id from data")
+                return False
             
-            # Process boxscore
-            self._process_boxscore_data(game_id, data)
+            # Use a transaction to ensure all data is committed together
+            with self.db.connection.begin() as conn:
+                # Save raw JSON (will use regular connection since method doesn't support transaction yet)
+                self._save_raw_json(game_id, 'boxscore', json.dumps(data))
+                
+                # Extract game date
+                game_date = None
+                if 'gameDate' in data:
+                    game_date = data['gameDate'][:10]  # Extract date part
+                elif 'liveData' in data and 'datetime' in data['liveData']:
+                    game_date = data['liveData']['datetime']['dateTime'][:10]
+                
+                # Fetch game metadata from schedule API for complete game info including game_type
+                game_metadata = self._fetch_game_metadata_if_needed(game_id)
+                
+                # Process boxscore
+                self._process_boxscore_data(game_id, data, game_date)
+                
+                # If we have game metadata, also process the game record with proper metadata
+                if game_metadata:
+                    # Create proper game data structure for _process_game_data with team information
+                    teams_data = data.get('teams', {})
+                    game_data_for_processing = {
+                        'teams': teams_data,  # Include full team data from boxscore
+                        'currentInning': data.get('liveData', {}).get('linescore', {}).get('currentInning'),
+                        'inningState': data.get('liveData', {}).get('linescore', {}).get('inningState')
+                    }
+                    self._process_game_data(game_id, game_data_for_processing, game_date, game_metadata)
+                
+                # Transaction will be committed automatically when exiting the context
             
             print(f"✅ Successfully loaded boxscore data for game {game_id}")
             return True
             
         except Exception as e:
             print(f"❌ Error processing boxscore data: {e}")
+            # Transaction will be rolled back automatically on exception
             return False
 
     def _load_game_data(self, data):
@@ -160,7 +231,7 @@ class JSONToSQLLoader:
             print(f"❌ Error processing game data: {e}")
             raise
 
-    def _process_boxscore_data(self, game_id, boxscore_data):
+    def _process_boxscore_data(self, game_id, boxscore_data, game_date=None):
         """Process and insert boxscore data."""
         try:
             teams = boxscore_data.get('teams', {})
@@ -264,6 +335,8 @@ class JSONToSQLLoader:
         ELSE
         UPDATE games SET 
             game_date = :game_date,
+            home_team_id = :home_team_id,
+            away_team_id = :away_team_id,
             home_score = :home_score,
             away_score = :away_score,
             inning = :inning,
@@ -325,6 +398,12 @@ class JSONToSQLLoader:
             for key, value in data.items():
                 if isinstance(value, dict) and 'gamePk' in value:
                     return value['gamePk']
+        
+        # If no game_id found in data, try to get it from current context
+        # This is a fallback - ideally the caller should pass the game_id explicitly
+        if hasattr(self, '_current_game_id'):
+            return self._current_game_id
+            
         return None
 
     def load_schedule_data(self, schedule_data):

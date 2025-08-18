@@ -46,6 +46,7 @@ class DatabaseConnection:
         """Establish a database connection."""
         try:
             connection_string = self.get_connection_string()
+            # For SQLAlchemy 2.0, we need to handle transactions differently
             self.engine = create_engine(connection_string)
             self.connection = self.engine.connect()
             print(f"✅ Connected to SQL Server: {self.server}/{self.database}")
@@ -88,10 +89,24 @@ class DatabaseConnection:
             if not self.connection:
                 self.connect()
             
+            # Just execute the query - let the caller handle transaction management
             result = self.connection.execute(text(query), params or {})
             return result
         except Exception as e:
             print(f"❌ Error executing query: {e}")
+            raise
+
+    def execute_with_transaction(self, query, params=None):
+        """Execute a database query with automatic transaction management."""
+        try:
+            if not self.connection:
+                self.connect()
+            
+            with self.connection.begin():
+                result = self.connection.execute(text(query), params or {})
+                return result
+        except Exception as e:
+            print(f"❌ Error executing query with transaction: {e}")
             raise
 
     def execute_transaction(self, queries):
@@ -99,6 +114,11 @@ class DatabaseConnection:
         try:
             if not self.connection:
                 self.connect()
+            
+            # For safety, let's close and reopen the connection to ensure clean state
+            if self.connection:
+                self.connection.close()
+            self.connection = self.engine.connect()
             
             trans = self.connection.begin()
             try:
