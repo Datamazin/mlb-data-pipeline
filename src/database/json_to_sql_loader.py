@@ -367,8 +367,8 @@ class JSONToSQLLoader:
         """Insert boxscore batting statistics."""
         query = """
         IF NOT EXISTS (SELECT 1 FROM boxscore WHERE game_id = :game_id AND player_id = :player_id)
-        INSERT INTO boxscore (game_id, player_id, team_id, at_bats, runs, hits, doubles, triples, home_runs, rbi, walks, strikeouts, game_date)
-        VALUES (:game_id, :player_id, :team_id, :at_bats, :runs, :hits, :doubles, :triples, :home_runs, :rbi, :walks, :strikeouts, :game_date)
+        INSERT INTO boxscore (game_id, player_id, team_id, at_bats, runs, hits, doubles, triples, home_runs, rbi, walks, strikeouts, stolen_bases, caught_stealing, game_date)
+        VALUES (:game_id, :player_id, :team_id, :at_bats, :runs, :hits, :doubles, :triples, :home_runs, :rbi, :walks, :strikeouts, :stolen_bases, :caught_stealing, :game_date)
         """
         params = {
             'game_id': game_id,
@@ -381,8 +381,10 @@ class JSONToSQLLoader:
             'triples': batting_stats.get('triples', 0),
             'home_runs': batting_stats.get('homeRuns', 0),
             'rbi': batting_stats.get('rbi', 0),
-            'walks': batting_stats.get('walks', 0),
+            'walks': batting_stats.get('baseOnBalls', 0),  # Fixed: baseOnBalls is the correct JSON field
             'strikeouts': batting_stats.get('strikeOuts', 0),
+            'stolen_bases': batting_stats.get('stolenBases', 0),  # New: capture stolen bases
+            'caught_stealing': batting_stats.get('caughtStealing', 0),  # New: capture caught stealing
             'game_date': game_date
         }
         self.db.execute_query(query, params)
