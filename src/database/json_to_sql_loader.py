@@ -77,7 +77,7 @@ class JSONToSQLLoader:
                 
                 # Extract and load boxscore data
                 if 'boxscore' in data:
-                    self._process_boxscore_data(game_id, data['boxscore'])
+                    self._process_boxscore_data(game_id, data['boxscore'], game_date)
                 
                 # Transaction will be committed automatically when exiting the context
             
