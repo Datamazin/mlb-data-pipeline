@@ -259,7 +259,7 @@ class JSONToSQLLoader:
                         batting = stats.get('batting', {})
                         if batting:
                             self._insert_boxscore_stats(game_id, person.get('id'), 
-                                                      team_info.get('id'), batting)
+                                                      team_info.get('id'), batting, game_date)
             
         except Exception as e:
             print(f"❌ Error processing boxscore data: {e}")
@@ -363,12 +363,12 @@ class JSONToSQLLoader:
         }
         self.db.execute_query(query, params)
 
-    def _insert_boxscore_stats(self, game_id, player_id, team_id, batting_stats):
+    def _insert_boxscore_stats(self, game_id, player_id, team_id, batting_stats, game_date=None):
         """Insert boxscore batting statistics."""
         query = """
         IF NOT EXISTS (SELECT 1 FROM boxscore WHERE game_id = :game_id AND player_id = :player_id)
-        INSERT INTO boxscore (game_id, player_id, team_id, at_bats, runs, hits, doubles, triples, home_runs, rbi, walks, strikeouts)
-        VALUES (:game_id, :player_id, :team_id, :at_bats, :runs, :hits, :doubles, :triples, :home_runs, :rbi, :walks, :strikeouts)
+        INSERT INTO boxscore (game_id, player_id, team_id, at_bats, runs, hits, doubles, triples, home_runs, rbi, walks, strikeouts, game_date)
+        VALUES (:game_id, :player_id, :team_id, :at_bats, :runs, :hits, :doubles, :triples, :home_runs, :rbi, :walks, :strikeouts, :game_date)
         """
         params = {
             'game_id': game_id,
@@ -382,7 +382,8 @@ class JSONToSQLLoader:
             'home_runs': batting_stats.get('homeRuns', 0),
             'rbi': batting_stats.get('rbi', 0),
             'walks': batting_stats.get('walks', 0),
-            'strikeouts': batting_stats.get('strikeOuts', 0)
+            'strikeouts': batting_stats.get('strikeOuts', 0),
+            'game_date': game_date
         }
         self.db.execute_query(query, params)
 

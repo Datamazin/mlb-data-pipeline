@@ -324,9 +324,10 @@ table Date
 				let
 				    Source = Sql.Database("localhost", "mlb_data"),
 				    dbo_dim_date = Source{[Schema="dbo",Item="dim_date"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(dbo_dim_date,{{"full_date", "Date"}})
+				    #"Renamed Columns" = Table.RenameColumns(dbo_dim_date,{{"full_date", "Date"}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each [Date] < #date(2025, 11, 3))
 				in
-				    #"Renamed Columns"
+				    #"Filtered Rows"
 
 	annotation PBI_NavigationStepName = Navigation
 

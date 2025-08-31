@@ -14,8 +14,9 @@ WITH PlayerStats AS (
         p.player_id,
         p.player_name,
         t.team_name,
-        SUM(b.hits) as hits,
+        COUNT(b.game_id) as game_count,
         SUM(b.at_bats) as at_bats,
+        SUM(b.hits) as hits,
         SUM(b.home_runs) as home_runs,
         SUM(b.rbi) as rbi,
         SUM(b.runs) as runs,
@@ -39,7 +40,7 @@ WITH PlayerStats AS (
     INNER JOIN players p ON b.player_id = p.player_id
     INNER JOIN teams t ON b.team_id = t.team_id
     INNER JOIN games g ON b.game_id = g.game_id
-    WHERE g.game_date >= '2025-03-01'
+    WHERE g.game_date >= '2025-08-15'
     GROUP BY p.player_id, p.player_name, t.team_name
     HAVING SUM(b.at_bats) >= 100  -- Qualified players
 )
@@ -48,6 +49,7 @@ WITH PlayerStats AS (
 SELECT 
     player_name,
     team_name,
+    game_count,
     FORMAT(batting_avg, 'N3') as BA,
     home_runs as HR,
     rbi as RBI,
@@ -187,7 +189,7 @@ WITH GamePerformance AS (
     INNER JOIN players p ON b.player_id = p.player_id
     INNER JOIN teams t ON b.team_id = t.team_id  
     INNER JOIN games g ON b.game_id = g.game_id
-    WHERE g.game_date >= '2025-03-01'
+    WHERE g.game_date >= '2025-08-18'
     AND b.at_bats > 0
 ),
 
