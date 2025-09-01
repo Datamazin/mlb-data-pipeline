@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Schedule - Sunday, August 31, 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header .date {
+            color: #666;
+            font-size: 1.3em;
+            font-weight: 300;
+        }
+        
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat {
+            text-align: center;
+            margin: 5px;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title .icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 0;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 15px 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #1e3c72;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-card.live {
+            border-left-color: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+        
+        .game-card.completed {
+            border-left-color: #27ae60;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3); }
+            100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        }
+        
+        .matchup {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .team {
+            display: inline-block;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 5px;
+            background: rgba(30, 60, 114, 0.1);
+        }
+        
+        .game-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            background: rgba(52, 73, 94, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status.scheduled { background: #3498db; color: white; }
+        .status.live { background: #e74c3c; color: white; }
+        .status.final { background: #27ae60; color: white; }
+        .status.postponed { background: #f39c12; color: white; }
+        
+        .score {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1e3c72;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .pitchers {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        
+        .venue {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+        }
+        
+        .no-games {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .no-games h2 {
+            color: #1e3c72;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header h1 { font-size: 2em; }
+            .stats-bar { flex-direction: column; }
+            .games-grid { grid-template-columns: 1fr; }
+            .game-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏟️ MLB Schedule</h1>
+            <div class="date">Sunday, August 31, 2025</div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Total Games</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Live</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Scheduled</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">✅</span> Completed Games
+            </div>
+            <div class="games-grid">
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">St. Louis Cardinals</span> @ <span class="team">Cincinnati Reds</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        4 - 7
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Andre Pallante vs Brady Singer</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Great American Ball Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">San Diego Padres</span> @ <span class="team">Minnesota Twins</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        2 - 7
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">David Morgan vs Joe Ryan</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Target Field
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Pittsburgh Pirates</span> @ <span class="team">Boston Red Sox</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        2 - 5
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Mitch Keller vs Lucas Giolito</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Fenway Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Tampa Bay Rays</span> @ <span class="team">Washington Nationals</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        7 - 4
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Ian Seymour vs Brad Lord</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Nationals Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Milwaukee Brewers</span> @ <span class="team">Toronto Blue Jays</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        4 - 8
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Brandon Woodruff vs Max Scherzer</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Rogers Centre
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Seattle Mariners</span> @ <span class="team">Cleveland Guardians</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        4 - 2
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Bryce Miller vs Tanner Bibee</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Progressive Field
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Miami Marlins</span> @ <span class="team">New York Mets</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        5 - 1
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Sandy Alcantara vs Kodai Senga</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Citi Field
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Los Angeles Angels</span> @ <span class="team">Houston Astros</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        3 - 0
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">José Soriano vs Hunter Brown</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Daikin Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Detroit Tigers</span> @ <span class="team">Kansas City Royals</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        5 - 0
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Tarik Skubal vs Michael Wacha</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Kauffman Stadium
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">New York Yankees</span> @ <span class="team">Chicago White Sox</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        2 - 3
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Luis Gil vs Martín Pérez</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Rate Field
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Chicago Cubs</span> @ <span class="team">Colorado Rockies</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        5 - 6
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Matthew Boyd vs Tanner Gordon</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Coors Field
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Baltimore Orioles</span> @ <span class="team">San Francisco Giants</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        2 - 13
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Tomoyuki Sugano vs Justin Verlander</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Oracle Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Texas Rangers</span> @ <span class="team">Athletics</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        9 - 6
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Jacob deGrom vs J.T. Ginn</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Sutter Health Park
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Arizona Diamondbacks</span> @ <span class="team">Los Angeles Dodgers</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        4 - 5
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Brandon Pfaadt vs Yoshinobu Yamamoto</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Dodger Stadium
+                    </div>
+
+                </div>
+
+                <div class="game-card completed">
+                    <div class="matchup">
+                        <span class="team">Atlanta Braves</span> @ <span class="team">Philadelphia Phillies</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span class="status final">Final</span>
+                    </div>
+
+                    <div class="score">
+                        3 - 1
+                    </div>
+
+                    <div class="pitchers">
+                        <div class="detail-label">Probable Pitchers</div>
+                        <div class="detail-value">Hurston Waldrep vs Jesús Luzardo</div>
+
+                    </div>
+
+                    <div class="venue">
+                        📍 Citizens Bank Park
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="footer">
+        <p>Generated on September 01, 2025 at 12:28 AM | Data provided by MLB Stats API</p>
+    </div>
+    
+    <script>
+        // Auto-refresh every 5 minutes for live games
+        if (0 > 0) {
+            setTimeout(() => {
+                location.reload();
+            }, 300000); // 5 minutes
+        }
+        
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -20,7 +20,7 @@ table boxscore
 		formatString: #,0
 		lineageTag: 17efa1a0-f9e7-461c-b1c6-8331d21d7e96
 
-	measure (RBI) = ```
+	measure '''RBI' = ```
 			
 			SUM(boxscore[rbi])
 			
@@ -163,6 +163,20 @@ table boxscore
 			       "📊 N/A")
 			```
 		lineageTag: 1bff1a52-7651-459e-95d3-fb377599b0a6
+
+	measure CS =
+			
+			SUM(boxscore[caught_stealing])
+		formatString: 0
+		lineageTag: 1fd4f9ba-06fa-4c2a-8821-b0ba3b7a0f73
+
+	measure HBP = ```
+			
+			SUM(boxscore[hit_by_pitch])
+			
+			```
+		formatString: 0
+		lineageTag: 9fba3cd8-d2c4-47d8-b815-3a27e6488ac0
 
 	column id
 		dataType: int64
@@ -348,10 +362,13 @@ table boxscore
 
 	column hit_by_pitch
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 6e52333c-7f91-464b-90ab-c771e0fc4283
 		summarizeBy: sum
 		sourceColumn: hit_by_pitch
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -370,6 +387,27 @@ table boxscore
 		lineageTag: bbb29e83-4dbd-4a4b-8d3b-8eca289d3869
 		summarizeBy: sum
 		sourceColumn: sacrifice_bunts
+
+		annotation SummarizationSetBy = Automatic
+
+	column stolen_bases
+		dataType: int64
+		formatString: 0
+		lineageTag: 32c86e0f-2c31-4117-a3a0-6d98119a4135
+		summarizeBy: sum
+		sourceColumn: stolen_bases
+
+		annotation SummarizationSetBy = Automatic
+
+	column caught_stealing
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e14c7d3f-8d03-478b-bc83-0b1ca74504a3
+		summarizeBy: sum
+		sourceColumn: caught_stealing
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
